@@ -10,6 +10,7 @@ namespace BulkyBook.DA
 
         }
 
-        public DbSet<Category> Categories { get; set; } 
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<CoverType> coverTypes { get; set; }
     }
 }

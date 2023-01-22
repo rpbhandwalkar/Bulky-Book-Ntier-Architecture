@@ -1,23 +1,21 @@
-﻿using BulkyBook.DA;
-using BulkyBook.DA.Repository;
-using BulkyBook.DA.Repository.IRepository;
+﻿using BulkyBook.DA.Repository.IRepository;
 using BulkyBook.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
 namespace BulkyBookWeb.Controllers
 {
-    public class CategoryController : Controller
+    public class CoverTypeController : Controller
     {
-        private readonly IUnitOfWork _unitOfWork;
-        public CategoryController(IUnitOfWork unitOfWork)
+        private IUnitOfWork _unitOfWork;
+        public CoverTypeController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
+
         public IActionResult Index()
         {
-            IEnumerable<Category> objcategory = _unitOfWork.category.GetAll();    
-            return View(objcategory);
+            IEnumerable<CoverType> coverTypes = _unitOfWork.coverType.GetAll();
+            return View(coverTypes);
         }
 
         public IActionResult Create()
@@ -27,56 +25,48 @@ namespace BulkyBookWeb.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Create(Category obj)
+        public IActionResult Create(CoverType obj)
         {
-            if (obj.Name == obj.DIsplayOrder.ToString())
+           
+            if (ModelState.IsValid)
             {
-                ModelState.AddModelError("Name", "The display order should not be same as name.");
-            }
-            if (ModelState.IsValid) {
-                _unitOfWork.category.Add(obj);
+                _unitOfWork.coverType.Add(obj);
                 _unitOfWork.Save();
-                TempData["success"] = "Category created successfully";
+                TempData["success"] = "Cover Type was created successfully";
                 return RedirectToAction("Index");
             }
             return View();
         }
 
-
-
         public IActionResult Edit(int? id)
         {
-            if (id==null || id==0)
+            if (id == null || id == 0)
             {
                 return NotFound();
             }
             //var catList = _context.Categories.Find(id);
 
-            var catList1 = _unitOfWork.category.GetFirstOrDefalut(x=>x.id == id);
+            var cover = _unitOfWork.coverType.GetFirstOrDefalut(x => x.Id == id);
             //var catList2 = _context.Categories.SingleOrDefault(x=>x.id == id);
-            if (catList1 == null)
+            if (cover == null)
                 return NotFound();
-            return View(catList1);
+            return View(cover);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public IActionResult Edit(Category obj)
+        public IActionResult Edit(CoverType obj)
         {
-            if (obj.Name == obj.DIsplayOrder.ToString())
-            {
-                ModelState.AddModelError("Name", "The display order should not be same as name.");
-            }
+            
             if (ModelState.IsValid)
             {
-                _unitOfWork.category.Update(obj);
+                _unitOfWork.coverType.Update(obj);
                 _unitOfWork.Save();
-                TempData["success"] = "Category updated successfully";
+                TempData["success"] = "cover Type updated successfully";
                 return RedirectToAction("Index");
             }
             return View();
         }
-
 
         public IActionResult Delete(int? id)
         {
@@ -85,12 +75,12 @@ namespace BulkyBookWeb.Controllers
                 return NotFound();
             }
             //var catList = _context.Categories.Find(id);
-           
-            var catList = _unitOfWork.category.GetFirstOrDefalut(x=>x.id == id);
+
+            var cover = _unitOfWork.coverType.GetFirstOrDefalut(x => x.Id == id);
             //var catList2 = _context.Categories.SingleOrDefault(x=>x.id == id);
-            if (catList == null)
+            if (cover == null)
                 return NotFound();
-            return View(catList);
+            return View(cover);
         }
 
         [HttpPost]
@@ -101,17 +91,17 @@ namespace BulkyBookWeb.Controllers
             {
                 return NotFound();
             }
-            var catList = _unitOfWork.category.GetFirstOrDefalut(x => x.id == id);
+            var cover = _unitOfWork.coverType.GetFirstOrDefalut(x => x.Id == id);
 
             if (ModelState.IsValid)
             {
-                _unitOfWork.category.Remove(catList);
+                _unitOfWork.coverType.Remove(cover);
                 _unitOfWork.Save();
-                TempData["success"] = "Category deleted successfully";
+                TempData["success"] = "Cover type deleted successfully";
                 return RedirectToAction("Index");
             }
             return View();
         }
-
     }
+
 }

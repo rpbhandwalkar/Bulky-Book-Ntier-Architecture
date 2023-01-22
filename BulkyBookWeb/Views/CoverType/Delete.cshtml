@@ -1,0 +1,19 @@
+﻿@model CoverType
+
+
+<form method="post" asp-action="DeletPost">
+    <input type="hidden" asp-for="Id" />
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary">Confirm Deleting Cover Type</h2>
+            <hr />
+        </div>
+        <div class="mb-3">
+            <label asp-for="Name"></label>
+            <input asp-for="Name"class="form-control" disabled/>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:150px">Delete</button>
+        <a asp-action="Index" class="btn btn-secondary" style="width:150px">Back</a>
+    </div>
+</form>
+
