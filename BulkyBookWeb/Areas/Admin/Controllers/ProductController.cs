@@ -1,5 +1,6 @@
 ﻿using BulkyBook.DA.Repository.IRepository;
 using BulkyBook.Models;
+using BulkyBook.Models.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -24,28 +25,30 @@ public class ProductController : Controller
     //Create and update in a single method
     public IActionResult Upsert(int? id)
     {
-        Product product = new();
-        //To create dropdown select list
-        IEnumerable<SelectListItem> CategoryList = _unitOfWork.category.GetAll().Select(
-        x => new SelectListItem
+        //To create select list for category list and cover type list
+        ProductVM productVM = new()
         {
-            Text = x.Name,
-            Value = x.id.ToString()
-        });
-        //To create dropdown select list
-        IEnumerable<SelectListItem> CoverTypeList = _unitOfWork.coverType.GetAll().Select(
-        x => new SelectListItem
-        {
-            Text = x.Name,
-            Value = x.Id.ToString()
-        });
+            product = new(),
+            categoryList = _unitOfWork.category.GetAll().Select(
+           x => new SelectListItem
+           {
+               Text = x.Name,
+               Value = x.id.ToString()
+           }),
+            coverTypeList = _unitOfWork.coverType.GetAll().Select(
+           x => new SelectListItem
+           {
+               Text = x.Name,
+               Value = x.Id.ToString()
+           }),
+        };
 
         if (id == null || id == 0)
         {
-            ViewBag.CategoryList = CategoryList;
-            ViewBag.CoverTypeList = CoverTypeList;
+            //ViewBag.CategoryList = CategoryList;
+            //ViewBag.CoverTypeList = CoverTypeList;
             //Create product
-            return View(product);
+            return View(productVM);
         }
         else
         {
@@ -57,17 +60,17 @@ public class ProductController : Controller
         ////var catList2 = _context.Categories.SingleOrDefault(x=>x.id == id);
         //if (cover == null)
         //    return NotFound();
-        return View(product);
+        return View(productVM);
     }
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Upsert(Product obj)
+    public IActionResult Upsert(ProductVM obj, IFormFile file)
     {
 
         if (ModelState.IsValid)
         {
-            _unitOfWork.product.Update(obj);
+            //_unitOfWork.product.Update(obj);
             _unitOfWork.Save();
             TempData["success"] = "cover Type updated successfully";
             return RedirectToAction("Index");
