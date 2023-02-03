@@ -21,7 +21,20 @@ namespace BulkyBook.DA.Repository
             var objFromDb = _db.products.FirstOrDefault(x => x.Id == obj.Id);
             if (objFromDb != null)
             {
-
+                objFromDb.Title = obj.Title;
+                objFromDb.Description = obj.Description;
+                objFromDb.Author = obj.Author;
+                objFromDb.Category = obj.Category;
+                objFromDb.ISBN = obj.ISBN;
+                objFromDb.Price = obj.Price;
+                objFromDb.Price50 = obj.Price50;
+                objFromDb.Price100 = obj.Price100;
+                objFromDb.CategoryId = obj.CategoryId;
+                objFromDb.CoverType = obj.CoverType;
+                if (obj.ImageUrl!=null)
+                {
+                    objFromDb.ImageUrl = obj.ImageUrl;
+                }
             }
         }
     }
