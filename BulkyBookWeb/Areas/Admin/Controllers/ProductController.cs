@@ -10,10 +10,12 @@ namespace BulkyBookWeb.Areas.Admin.Controllers;
 [Area("Admin")]
 public class ProductController : Controller
 {
-    private IUnitOfWork _unitOfWork;
-    public ProductController(IUnitOfWork unitOfWork)
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly IWebHostEnvironment _webHostEnvironment;
+    public ProductController(IUnitOfWork unitOfWork, IWebHostEnvironment webHostEnvironment)
     {
         _unitOfWork = unitOfWork;
+        _webHostEnvironment = webHostEnvironment;   
     }
 
     public IActionResult Index()
@@ -70,12 +72,24 @@ public class ProductController : Controller
 
         if (ModelState.IsValid)
         {
-            //_unitOfWork.product.Update(obj);
+            string wwwRootPath = _webHostEnvironment.WebRootPath;
+            if (file!=null)
+            {
+                string fileName = Guid.NewGuid().ToString();
+                var upload = Path.Combine(wwwRootPath, @"images\products");
+                var extension = Path.GetExtension(file.FileName);
+                using (var fileStreams = new FileStream(Path.Combine(upload, fileName + extension), FileMode.Create)) { 
+                    file.CopyTo(fileStreams);
+                }
+                obj.product.ImageUrl = @"\images\products\" + fileName + extension;
+
+            }
+            _unitOfWork.product.Add(obj.product);
             _unitOfWork.Save();
             TempData["success"] = "cover Type updated successfully";
-            return RedirectToAction("Index");
+            //return RedirectToAction("Index");
         }
-        return View();
+        return View(obj);
     }
 
     public IActionResult Delete(int? id)

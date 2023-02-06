@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,9 @@ namespace BulkyBook.Models.ViewModel
         public Product product { get; set; }
 
         //To create dropdown select list
+        [ValidateNever]
         public IEnumerable<SelectListItem> categoryList { get; set; }
+        [ValidateNever]
         //To create dropdown select list
         public IEnumerable<SelectListItem> coverTypeList { get; set; }
     }

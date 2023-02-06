@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -28,7 +29,7 @@ namespace BulkyBook.Models
         public double Price50 { get; set; }
         [Range(1, 1000)]
         public double Price100 { get; set; }
-
+        [ValidateNever]
         public string ImageUrl { get; set; }
 
         //for setting foregin key relation with table category
@@ -36,11 +37,13 @@ namespace BulkyBook.Models
         public int CategoryId { get; set; }
         //Only requried if the CategoryId is not appended with ID for example CategoryType 
         [ForeignKey("CategoryId")]
+        [ValidateNever]
         public Category Category { get; set; }
 
         //for setting foregin key relation with table covertype
         [Required]
         public int CoverTypeId { get; set; }
+        [ValidateNever]
         public CoverType CoverType { get; set; }
 
 
