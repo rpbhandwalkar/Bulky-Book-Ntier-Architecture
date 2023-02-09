@@ -14,6 +14,7 @@ namespace BulkyBook.Models.ViewModel
 
         //To create dropdown select list
         [ValidateNever]
+        //create dropdown list
         public IEnumerable<SelectListItem> categoryList { get; set; }
         [ValidateNever]
         //To create dropdown select list
