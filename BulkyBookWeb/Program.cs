@@ -11,6 +11,8 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(option=>option.UseSqlServer(
     builder.Configuration.GetConnectionString("DefaultConnection")
     ));
+//builder.Services.AddSingleton<ApplicationDbContext, ApplicationDbContext>();
+//builder.Services.AddTransient<>
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 var app = builder.Build();
 
