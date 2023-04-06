@@ -16,6 +16,7 @@ namespace BulkyBook.DA.Repository
         public Repository(ApplicationDbContext context)
         {
             _context = context;
+            //_context.products.Include(x => x.Category).Include(x=>x.CoverType);
             DbSet = _context.Set<T>();
         }
 
@@ -24,15 +25,30 @@ namespace BulkyBook.DA.Repository
             DbSet.Add(entity);
         }
 
-        public IEnumerable<T> GetAll()
+        //include Property -> "Category,Covertype"
+        public IEnumerable<T> GetAll(string? includeProperties = null)
         {
             IQueryable<T> query = DbSet;
+            if (includeProperties!=null)
+            {
+                foreach (var item in includeProperties.Split(new char[] { ','}, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(item);
+                }
+            }
             return query.ToList();
         }
 
-        public T GetFirstOrDefalut(Expression<Func<T, bool>> filter)
+        public T GetFirstOrDefalut(Expression<Func<T, bool>> filter, string? includeProperties = null)
         {
             IQueryable<T> query = DbSet;
+            if (includeProperties != null)
+            {
+                foreach (var item in includeProperties.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    query = query.Include(item);
+                }
+            }
             query = query.Where(filter);
             return query.FirstOrDefault();
         }

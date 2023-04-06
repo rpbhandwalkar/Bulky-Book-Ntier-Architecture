@@ -3,6 +3,7 @@ using BulkyBook.Models;
 using BulkyBook.Models.ViewModel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.Extensions.Hosting;
 
 //Before .net 6 this was procedure to define areas after creating folders based on previlages
 //This is not needed anymore but just to be on safe side we can define it
@@ -20,8 +21,7 @@ public class ProductController : Controller
 
     public IActionResult Index()
     {
-        IEnumerable<Product> Products = _unitOfWork.product.GetAll();
-        return View(Products);
+        return View();
     }
 
     //Create and update in a single method
@@ -47,14 +47,12 @@ public class ProductController : Controller
 
         if (id == null || id == 0)
         {
-            //ViewBag.CategoryList = CategoryList;
-            //ViewBag.CoverTypeList = CoverTypeList;
-            //Create product
+            productVM.product = _unitOfWork.product.GetFirstOrDefalut(x=>x.Id == id);
             return View(productVM);
         }
         else
         {
-            //Update user
+            productVM.product = _unitOfWork.product.GetFirstOrDefalut(x => x.Id == id);
         }
         //var catList = _context.Categories.Find(id);
 
@@ -67,7 +65,7 @@ public class ProductController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public IActionResult Upsert(ProductVM obj, IFormFile file)
+    public IActionResult Upsert(ProductVM obj, IFormFile? file)
     {
 
         if (ModelState.IsValid)
@@ -78,16 +76,33 @@ public class ProductController : Controller
                 string fileName = Guid.NewGuid().ToString();
                 var upload = Path.Combine(wwwRootPath, @"images\products");
                 var extension = Path.GetExtension(file.FileName);
+
+                if (obj.product.ImageUrl!=null)
+                {
+                    var oldImage = Path.Combine(wwwRootPath, obj.product.ImageUrl.Trim('\\'));
+                    if (System.IO.File.Exists(oldImage))
+                    {
+                        System.IO.File.Delete(oldImage);
+                    }
+                }
+
                 using (var fileStreams = new FileStream(Path.Combine(upload, fileName + extension), FileMode.Create)) { 
                     file.CopyTo(fileStreams);
                 }
                 obj.product.ImageUrl = @"\images\products\" + fileName + extension;
 
             }
-            _unitOfWork.product.Add(obj.product);
+            if (obj.product.Id == 0 )
+            {
+                _unitOfWork.product.Add(obj.product);
+            }
+            else
+            {
+                _unitOfWork.product.Update(obj.product);
+            }
             _unitOfWork.Save();
-            TempData["success"] = "cover Type updated successfully";
-            //return RedirectToAction("Index");
+            TempData["success"] = "Product created successfully";
+            return RedirectToAction("Index");
         }
         return View(obj);
     }
@@ -116,7 +131,7 @@ public class ProductController : Controller
             return NotFound();
         }
         var cover = _unitOfWork.product.GetFirstOrDefalut(x => x.Id == id);
-
+        
         if (ModelState.IsValid)
         {
             _unitOfWork.product.Remove(cover);
@@ -126,5 +141,39 @@ public class ProductController : Controller
         }
         return View();
     }
+
+    #region API Calls
+    [HttpGet]
+    public IActionResult GetAll() {
+        var Products = _unitOfWork.product.GetAll(includeProperties : "Category,CoverType");
+        return Json(new {data = Products});
+    }
+
+    [HttpDelete]
+    public IActionResult DeletPostAPI(int? id)
+    {
+        if (id == null || id == 0)
+        {
+            return Json(new { success = false, message = "Error while deleting"});
+        }
+        var obj = _unitOfWork.product.GetFirstOrDefalut(x => x.Id == id);
+
+        var oldImage = Path.Combine(_webHostEnvironment.WebRootPath, obj.ImageUrl.Trim('\\'));
+        if (System.IO.File.Exists(oldImage))
+        {
+            System.IO.File.Delete(oldImage);
+        }
+
+
+        if (ModelState.IsValid)
+        {
+            _unitOfWork.product.Remove(obj);
+            _unitOfWork.Save();
+            return Json(new { success = true, message = "Delete Sucessful" });
+        }
+        return View();
+    }
+
+    #endregion
 }
 
